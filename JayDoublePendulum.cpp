@@ -4,8 +4,8 @@
 
 // Constants
 const double g = 9.81;  // Gravity
-const double L1 = 50.0;  // Length of first pendulum (in pixels)
-const double L2 = 50.0;  // Length of second pendulum (in pixels)
+const double L1 = 200.0;  // Length of first pendulum (in pixels)
+const double L2 = 200.0;  // Length of second pendulum (in pixels)
 const double m1 = 1.0;  // Mass of first pendulum
 const double m2 = 1.0;  // Mass of second pendulum
 
