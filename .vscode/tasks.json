@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "/usr/local/bin/g++",
+            "args": [
+                "-std=c++17",
+                "JayDoublePendulum.cpp",
+                "-o",
+                "JayDoublePendulum",
+                "-I/usr/local/include",
+                "-L/usr/local/lib",
+                "-lsfml-graphics",
+                "-lsfml-window",
+                "-lsfml-system"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Generated task by VS Code"
+        }
+    ]
+}
