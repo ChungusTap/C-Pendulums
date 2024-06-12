@@ -4,8 +4,8 @@
 
 // Constants
 const double g = 9.81;  // Gravity
-const double L1 = 200.0;  // Length of first pendulum (in pixels)
-const double L2 = 200.0;  // Length of second pendulum (in pixels)
+const double L1 = 100.0;  // Length of first pendulum (in pixels)
+const double L2 = 100.0;  // Length of second pendulum (in pixels)
 const double m1 = 1.0;  // Mass of first pendulum
 const double m2 = 1.0;  // Mass of second pendulum
 
@@ -107,3 +107,6 @@ void derivatives(double* state, double* dstate, double t) {
                  (m1 + m2) * L1 * omega1 * omega1 * sin(delta) -
                  (m1 + m2) * g * sin(theta2)) / den2;
 }
+
+// To Run
+//g++ JayDoublePendulum.cpp -o prog -I/opt/homebrew/Cellar/sfml/2.6.1/include -L/opt/homebrew/Cellar/sfml/2.6.1/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network
