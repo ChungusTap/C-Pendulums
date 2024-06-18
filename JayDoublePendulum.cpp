@@ -4,23 +4,30 @@
 
 // Constants
 const double g = 9.81;  // Gravity
-const double L1 = 100.0;  // Length of first pendulum (in pixels)
-const double L2 = 100.0;  // Length of second pendulum (in pixels)
+const double L1 = 100.0;  // Length of first pendulum 
+const double L2 = 100.0;  // Length of second pendulum 
 const double m1 = 1.0;  // Mass of first pendulum
 const double m2 = 1.0;  // Mass of second pendulum
 
 // Function prototypes
 void rungeKutta(double* state, double t, double dt);
 void derivatives(double* state, double* dstate, double t);
+sf::Vector2f calculatePendulumPosition(double L, double theta, const sf::Vector2f& origin);
+void handleUserInput(sf::RenderWindow& window, double* state, bool& isPaused, bool& isDragging1, bool& isDragging2, sf::Vector2f& dragOffset, const sf::Vector2f& origin);
 
 // Main function
 int main() {
     double t = 0.0;
-    double dt = 0.01;
+    double dt = 0.2;  
     double state[4] = { M_PI / 2, 0, M_PI / 2, 0 }; // initial conditions: theta1, omega1, theta2, omega2
 
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "Double Pendulum");
+    bool isPaused = true;
+    bool isDragging1 = false;
+    bool isDragging2 = false;
+    sf::Vector2f dragOffset(0, 0);
+    sf::Vector2f origin(400, 300);
 
     while (window.isOpen()) {
         // Process events
@@ -30,19 +37,22 @@ int main() {
                 window.close();
         }
 
-        // Clear screen
-        window.clear();
+        handleUserInput(window, state, isPaused, isDragging1, isDragging2, dragOffset, origin);
 
-        // Perform Runge-Kutta integration
-        rungeKutta(state, t, dt);
-        t += dt;
+        if (!isPaused && !isDragging1 && !isDragging2) {
+            // Perform Runge-Kutta integration
+            rungeKutta(state, t, dt);
+            t += dt;
+        }
 
         // Convert angles to coordinates
         double theta1 = state[0];
         double theta2 = state[2];
-        sf::Vector2f origin(400, 300);
-        sf::Vector2f p1(origin.x + L1 * sin(theta1), origin.y + L1 * cos(theta1));
-        sf::Vector2f p2(p1.x + L2 * sin(theta2), p1.y + L2 * cos(theta2));
+        sf::Vector2f p1 = calculatePendulumPosition(L1, theta1, origin);
+        sf::Vector2f p2 = calculatePendulumPosition(L2, theta2, p1);
+
+        // Clear screen
+        window.clear();
 
         // Draw the pendulum
         sf::Vertex line1[] = { sf::Vertex(origin), sf::Vertex(p1) };
@@ -62,6 +72,9 @@ int main() {
 
         // Update the window
         window.display();
+
+        // Add delay to slow down the rendering speed
+        sf::sleep(sf::milliseconds(16)); 
     }
 
     return 0;
@@ -76,7 +89,7 @@ void rungeKutta(double* state, double t, double dt) {
     derivatives(temp, k2, t + 0.5 * dt);
     for (int i = 0; i < 4; ++i) temp[i] = state[i] + 0.5 * dt * k2[i];
     derivatives(temp, k3, t + 0.5 * dt);
-    for (int i = 0; ++i < 4; i) temp[i] = state[i] + dt * k3[i];
+    for (int i = 0; i < 4; ++i) temp[i] = state[i] + dt * k3[i];
     derivatives(temp, k4, t + dt);
 
     for (int i = 0; i < 4; ++i) {
@@ -107,6 +120,53 @@ void derivatives(double* state, double* dstate, double t) {
                  (m1 + m2) * L1 * omega1 * omega1 * sin(delta) -
                  (m1 + m2) * g * sin(theta2)) / den2;
 }
+
+// Calculate pendulum position based on length and angle
+sf::Vector2f calculatePendulumPosition(double L, double theta, const sf::Vector2f& origin) {
+    return sf::Vector2f(origin.x + L * sin(theta), origin.y + L * cos(theta));
+}
+
+// Handle user input for interactivity
+void handleUserInput(sf::RenderWindow& window, double* state, bool& isPaused, bool& isDragging1, bool& isDragging2, sf::Vector2f& dragOffset, const sf::Vector2f& origin) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+    // Calculate pendulum positions
+    sf::Vector2f p1 = calculatePendulumPosition(L1, state[0], origin);
+    sf::Vector2f p2 = calculatePendulumPosition(L2, state[2], p1);
+
+    // Check if user is dragging one of the balls
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (!isDragging1 && !isDragging2) {
+            if (std::hypot(mousePos.x - p1.x, mousePos.y - p1.y) < 10) {
+                isDragging1 = true;
+                dragOffset = sf::Vector2f(mousePos) - p1;
+                isPaused = true;
+            } else if (std::hypot(mousePos.x - p2.x, mousePos.y - p2.y) < 10) {
+                isDragging2 = true;
+                dragOffset = sf::Vector2f(mousePos) - p2;
+                isPaused = true;
+            }
+        } else if (isDragging1) {
+            sf::Vector2f newP1 = sf::Vector2f(mousePos) - dragOffset;
+            double dx = newP1.x - origin.x;
+            double dy = newP1.y - origin.y;
+            state[0] = std::atan2(dx, dy);
+        } else if (isDragging2) {
+            sf::Vector2f newP2 = sf::Vector2f(mousePos) - dragOffset;
+            double dx = newP2.x - p1.x;
+            double dy = newP2.y - p1.y;
+            state[2] = std::atan2(dx, dy);
+        }
+    } else {
+        isDragging1 = false;
+        isDragging2 = false;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+            isPaused = !isPaused;
+        }
+    }
+}
+
+
 
 // To Run
 //g++ JayDoublePendulum.cpp -o prog -I/opt/homebrew/Cellar/sfml/2.6.1/include -L/opt/homebrew/Cellar/sfml/2.6.1/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network
