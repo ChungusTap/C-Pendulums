@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <iostream>
+#include <vector>
+#include <string>
 
 // Constants
 const double g = 9.81;  // Gravity
@@ -29,6 +31,27 @@ int main() {
     sf::Vector2f dragOffset(0, 0);
     sf::Vector2f origin(400, 300);
 
+    // Vector to store the trail positions
+    std::vector<sf::Vector2f> trail;
+
+    // Clock to keep track of elapsed time
+    sf::Clock clock;
+    sf::Time elapsedTime = sf::Time::Zero;
+
+    // Load font
+    sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) {
+        std::cerr << "Error loading font\n";
+        return -1;
+    }
+
+    // Text to display elapsed time
+    sf::Text timerText;
+    timerText.setFont(font);
+    timerText.setCharacterSize(24);
+    timerText.setFillColor(sf::Color::White);
+    timerText.setPosition(650, 10);
+
     while (window.isOpen()) {
         // Process events
         sf::Event event;
@@ -43,6 +66,12 @@ int main() {
             // Perform Runge-Kutta integration
             rungeKutta(state, t, dt);
             t += dt;
+
+            // Update elapsed time
+            elapsedTime += clock.restart();
+        } else {
+            // If paused, reset the clock to not accumulate time
+            clock.restart();
         }
 
         // Convert angles to coordinates
@@ -51,8 +80,20 @@ int main() {
         sf::Vector2f p1 = calculatePendulumPosition(L1, theta1, origin);
         sf::Vector2f p2 = calculatePendulumPosition(L2, theta2, p1);
 
+        // Add the current position of the blue mass to the trail
+        trail.push_back(p2);
+
         // Clear screen
         window.clear();
+
+        // Draw the trail
+        for (const auto& point : trail) {
+            sf::CircleShape trailPoint(2);
+            trailPoint.setOrigin(1, 1);
+            trailPoint.setPosition(point);
+            trailPoint.setFillColor(sf::Color::Red);
+            window.draw(trailPoint);
+        }
 
         // Draw the pendulum
         sf::Vertex line1[] = { sf::Vertex(origin), sf::Vertex(p1) };
@@ -69,6 +110,10 @@ int main() {
         window.draw(line2, 2, sf::Lines);
         window.draw(ball1);
         window.draw(ball2);
+
+        // Update the timer text
+        timerText.setString("Time: " + std::to_string(elapsedTime.asSeconds()));
+        window.draw(timerText);
 
         // Update the window
         window.display();
@@ -165,6 +210,8 @@ void handleUserInput(sf::RenderWindow& window, double* state, bool& isPaused, bo
         }
     }
 }
+
+
 
 
 
