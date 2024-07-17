@@ -5,11 +5,13 @@
 #include <string>
 
 // Constants
-const double g = 9.81;  // Gravity
+const double g = 40;  // Gravity
 const double L1 = 100.0;  // Length of first pendulum 
 const double L2 = 100.0;  // Length of second pendulum 
 const double m1 = 1.0;  // Mass of first pendulum
 const double m2 = 1.0;  // Mass of second pendulum
+const double damping1 = 2.0;  // Damping coefficient for first pendulum
+const double damping2 = 2.0;  // Damping coefficient for second pendulum
 
 // Function prototypes
 void rungeKutta(double* state, double t, double dt);
@@ -157,13 +159,13 @@ void derivatives(double* state, double* dstate, double t) {
     dstate[1] = (m2 * L1 * omega1 * omega1 * sin(delta) * cos(delta) +
                  m2 * g * sin(theta2) * cos(delta) +
                  m2 * L2 * omega2 * omega2 * sin(delta) -
-                 (m1 + m2) * g * sin(theta1)) / den1;
+                 (m1 + m2) * g * sin(theta1) - damping1 * omega1) / den1; // Add damping term
 
     dstate[2] = omega2;
     dstate[3] = (-m2 * L2 * omega2 * omega2 * sin(delta) * cos(delta) +
                  (m1 + m2) * g * sin(theta1) * cos(delta) -
                  (m1 + m2) * L1 * omega1 * omega1 * sin(delta) -
-                 (m1 + m2) * g * sin(theta2)) / den2;
+                 (m1 + m2) * g * sin(theta2) - damping2 * omega2) / den2; // Add damping term
 }
 
 // Calculate pendulum position based on length and angle
