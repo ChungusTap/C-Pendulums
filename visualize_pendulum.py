@@ -31,6 +31,9 @@ def main():
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Double Pendulum")
 
+    # Load the font
+    font = pygame.font.SysFont(None, 36)
+
     clock = pygame.time.Clock()
     running = True
     paused = False  # Add a flag to track the pause state
@@ -40,6 +43,7 @@ def main():
 
     # Initialize time
     t = 0.0
+    elapsed_time = 0.0
 
     while running:
         for event in pygame.event.get():
@@ -64,6 +68,9 @@ def main():
             if len(trail) > 1000:  # Limit trail length
                 trail.pop(0)
 
+            # Update elapsed time
+            elapsed_time += clock.get_time() / 1000.0  # Convert milliseconds to seconds
+
         # Clear screen
         screen.fill((0, 0, 0))
 
@@ -77,6 +84,10 @@ def main():
         pygame.draw.circle(screen, (255, 0, 0), (int(p1[0]), int(p1[1])), 10)
         pygame.draw.circle(screen, (0, 0, 255), (int(p2[0]), int(p2[1])), 10)
 
+        # Render the timer text
+        timer_text = font.render(f"Time: {elapsed_time:.2f} s", True, (255, 255, 255))
+        screen.blit(timer_text, (600, 10))  # Position the text at the top-right corner
+
         # Update the display
         pygame.display.flip()
 
@@ -87,6 +98,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
 
 
