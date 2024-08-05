@@ -33,6 +33,7 @@ def main():
 
     clock = pygame.time.Clock()
     running = True
+    paused = False  # Add a flag to track the pause state
 
     # List to store the trail of the second pendulum
     trail = []
@@ -44,20 +45,24 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    paused = not paused  # Toggle the pause state
 
-        # Perform Runge-Kutta integration
-        lib.rungeKutta(state.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), ctypes.c_double(t), ctypes.c_double(dt))
-        t += dt
+        if not paused:
+            # Perform Runge-Kutta integration
+            lib.rungeKutta(state.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), ctypes.c_double(t), ctypes.c_double(dt))
+            t += dt
 
-        # Calculate positions
-        theta1, theta2 = state[0], state[2]
-        p1 = calculate_pendulum_position(L1, theta1, origin)
-        p2 = calculate_pendulum_position(L2, theta2, p1)
+            # Calculate positions
+            theta1, theta2 = state[0], state[2]
+            p1 = calculate_pendulum_position(L1, theta1, origin)
+            p2 = calculate_pendulum_position(L2, theta2, p1)
 
-        # Add the current position of the second pendulum to the trail
-        trail.append(p2)
-        if len(trail) > 1000:  # Limit trail length
-            trail.pop(0)
+            # Add the current position of the second pendulum to the trail
+            trail.append(p2)
+            if len(trail) > 1000:  # Limit trail length
+                trail.pop(0)
 
         # Clear screen
         screen.fill((0, 0, 0))
@@ -82,5 +87,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

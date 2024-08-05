@@ -1,4 +1,3 @@
-// pendulum.cpp
 
 #include <cmath>
 
