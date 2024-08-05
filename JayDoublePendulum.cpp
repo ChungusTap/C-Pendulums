@@ -146,7 +146,7 @@ void rungeKutta(double* state, double t, double dt) {
     }
 }
 
-// Derivatives function
+/// Derivatives function
 void derivatives(double* state, double* dstate, double t) {
     double theta1 = state[0];
     double omega1 = state[1];
@@ -159,17 +159,20 @@ void derivatives(double* state, double* dstate, double t) {
     double den2 = (L2 / L1) * den1;
 
     dstate[0] = omega1;
-    dstate[1] = ((m2 * L1 * omega1 * omega1 * sin(delta) * cos(delta) +
+
+    dstate[1] = (m2 * L1 * omega1 * omega1 * sin(delta) * cos(delta) +
                  m2 * g * sin(theta2) * cos(delta) +
                  m2 * L2 * omega2 * omega2 * sin(delta) -
-                 (m1 + m2) * g * sin(theta1) - damping1 * omega1) / den1) - ((m1 + m2) * g * sin(theta1) / I1);
+                 (m1 + m2) * g * sin(theta1) - damping1 * omega1) / den1;
 
     dstate[2] = omega2;
-    dstate[3] = ((-m2 * L2 * omega2 * omega2 * sin(delta) * cos(delta) +
+
+    dstate[3] = (-m2 * L2 * omega2 * omega2 * sin(delta) * cos(delta) +
                  (m1 + m2) * g * sin(theta1) * cos(delta) -
                  (m1 + m2) * L1 * omega1 * omega1 * sin(delta) -
-                 (m1 + m2) * g * sin(theta2) - damping2 * omega2) / den2) - ((m1 + m2) * g * sin(theta2) / I2);
+                 (m1 + m2) * g * sin(theta2) - damping2 * omega2) / den2;
 }
+
 
 // Calculate pendulum position based on length and angle
 sf::Vector2f calculatePendulumPosition(double L, double theta, const sf::Vector2f& origin) {
@@ -215,7 +218,6 @@ void handleUserInput(sf::RenderWindow& window, double* state, bool& isPaused, bo
         }
     }
 }
-
 
 // To Run
 //g++ JayDoublePendulum.cpp -o prog -I/opt/homebrew/Cellar/sfml/2.6.1/include -L/opt/homebrew/Cellar/sfml/2.6.1/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network
