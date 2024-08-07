@@ -17,7 +17,7 @@ origin = (400, 300)  # Origin point for the pendulum
 
 # Initialize the state
 state = np.array([np.pi / 2, 0, np.pi / 2, 0], dtype=np.double)
-dt = 0.02  # Smaller dt for smoother animation
+dt = 0.06  # Smaller dt for smoother animation
 
 def calculate_pendulum_position(L, theta, origin):
     """Calculate pendulum position based on length and angle."""
