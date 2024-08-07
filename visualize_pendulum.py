@@ -36,7 +36,11 @@ def main():
 
     clock = pygame.time.Clock()
     running = True
-    paused = False  # Add a flag to track the pause state
+    paused = True  # Start the simulation in a paused state
+
+    # Initialize pendulum positions
+    p1 = calculate_pendulum_position(L1, state[0], origin)
+    p2 = calculate_pendulum_position(L2, state[2], p1)
 
     # List to store the trail of the second pendulum
     trail = []
@@ -98,3 +102,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
